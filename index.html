@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
+  <title>Ingreso al sistema</title>
   <link rel="stylesheet" href="css/styles.css">
 </head>
 
@@ -13,17 +13,28 @@
     <div class="login-card">
       <h1>Ingreso al sistema</h1>
 
-      <form>
+      <form id="loginForm">
         <label>Usuario</label>
-        <input type="text">
+        <input type="text" required>
 
         <label>Contraseña</label>
-        <input type="password">
+        <input type="password" required>
 
-        <button class="btn-primary">Ingresar</button>
+        <button class="btn-primary" type="submit">
+          Ingresar
+        </button>
       </form>
     </div>
   </div>
 
+  <!-- ✅ JS QUE HACE FUNCIONAR EL BOTÓN -->
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", function (e) {
+      e.preventDefault(); // evita recarga
+      window.location.href = "dashboard.html";
+    });
+  </script>
+
 </body>
 </html>
+

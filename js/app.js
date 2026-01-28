@@ -5,7 +5,7 @@ function login() {
   if (loading) loading.style.display = "block";
 
   const users = [
-  { user: "admin", pass: "1234", role: "admin" },
+  { user: "CHORI_Admin", pass: "062708", role: "admin" },
   { user: "almacen", pass: "1234", role: "almacen" }
 ];
 
@@ -13,4 +13,5 @@ function login() {
     window.location.href = "dashboard.html";
   }, 1000);
 }
+
 

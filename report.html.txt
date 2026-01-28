@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Registrar Daño</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <h2>Registrar insumo dañado</h2>
+
+  <label>Sucursal</label>
+  <input type="text" />
+
+  <label>Insumo</label>
+  <input type="text" />
+
+  <label>Cantidad</label>
+  <input type="number" />
+
+  <label>Motivo</label>
+  <select>
+    <option>Roto</option>
+    <option>Vencido</option>
+    <option>Mala manipulación</option>
+  </select>
+
+  <label>Foto</label>
+  <input type="file" />
+
+  <button>Enviar</button>
+</body>
+</html>

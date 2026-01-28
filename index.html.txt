@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login - Control de Insumos</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <h2>Ingreso al sistema</h2>
+
+  <input type="text" id="username" placeholder="Usuario" />
+  <input type="password" id="password" placeholder="Contraseña" />
+  <button onclick="login()">Entrar</button>
+
+  <div id="loading" style="display: none;">Cargando...</div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

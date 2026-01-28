@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Aprobaciones</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <h2>Solicitudes pendientes</h2>
+
+  <div class="card">
+    <p>Insumo: Vaso 12oz</p>
+    <p>Cantidad: 10</p>
+    <button>Aprobar</button>
+    <button>Rechazar</button>
+  </div>
+</body>
+</html>

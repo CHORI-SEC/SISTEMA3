@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Historial</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <h2>Historial de daños</h2>
+
+  <table>
+    <tr>
+      <th>Fecha</th>
+      <th>Insumo</th>
+      <th>Cantidad</th>
+      <th>Estado</th>
+    </tr>
+    <tr>
+      <td>20/01</td>
+      <td>Botella</td>
+      <td>5</td>
+      <td>Aprobado</td>
+    </tr>
+  </table>
+</body>
+</html>

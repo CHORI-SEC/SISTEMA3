@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <h2>Dashboard</h2>
+
+  <a href="report.html">Registrar insumo dañado</a><br><br>
+  <a href="approve.html">Aprobaciones</a><br><br>
+  <a href="history.html">Historial</a>
+
+</body>
+</html>

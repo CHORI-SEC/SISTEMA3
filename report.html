@@ -1,43 +1,25 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Registrar Daño</title>
-  <link rel="stylesheet" href="css/styles.css" />
+  <meta charset="UTF-8">
+  <title>Reportar Insumo</title>
 </head>
 <body>
-  <h2>Registrar insumo dañado</h2>
 
-  <label>Sucursal</label>
-  <input type="text" />
+<h2>Reportar Insumo Dañado</h2>
 
-  <label>Insumo</label>
-  <input type="text" />
+<input id="name" placeholder="Nombre del insumo"><br><br>
+<input id="qty" type="number" placeholder="Cantidad"><br><br>
+<input id="reason" placeholder="Motivo"><br><br>
 
-  <h2>Reportar Insumo Dañado</h2>
-
-<input id="name" placeholder="Nombre del insumo">
-<input id="qty" type="number" placeholder="Cantidad">
-<input id="reason" placeholder="Motivo">
-
-<button onclick="addItem()">Enviar</button>
+<button id="sendBtn">Enviar</button>
 
 <script src="js/app.js"></script>
+<script>
+  protectPage();
 
-  <label>Cantidad</label>
-  <input type="number" />
+  document.getElementById("sendBtn").addEventListener("click", addItem);
+</script>
 
-  <label>Motivo</label>
-  <select>
-    <option>Roto</option>
-    <option>Vencido</option>
-    <option>Mala manipulación</option>
-  </select>
-
-  <label>Foto</label>
-  <input type="file" />
-
-  <button>Enviar</button>
 </body>
 </html>
-

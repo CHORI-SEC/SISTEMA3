@@ -27,14 +27,22 @@
     </div>
   </div>
 
-  <!-- ✅ JS QUE HACE FUNCIONAR EL BOTÓN -->
-  <script>
-    document.getElementById("loginForm").addEventListener("submit", function (e) {
-      e.preventDefault(); // evita recarga
-      window.location.href = "dashboard.html";
+<form onsubmit="login(); return false;">
+  <label>Usuario</label>
+  <input id="username" type="text" required>
+
+  <label>Contraseña</label>
+  <input id="password" type="password" required>
+
+  <button class="btn-primary" type="submit">Ingresar</button>
+</form>
+
+<script src="js/app.js"></script>
+
     });
   </script>
 
 </body>
 </html>
+
 

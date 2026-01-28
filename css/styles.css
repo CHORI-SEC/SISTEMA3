@@ -127,3 +127,36 @@ a:hover {
   margin-top: 10px;
 }
 
+/* ===== LOGIN ===== */
+.login-body {
+  min-height: 100vh;
+  background-color: var(--color-fondo);
+}
+
+.login-wrapper {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1em;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 380px;
+  background-color: var(--color-fondo);
+  border: 1px solid var(--color-secundario);
+  border-radius: 14px;
+  padding: 2em;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.login-card h1 {
+  text-align: center;
+  margin-bottom: 1.5em;
+}
+
+.login-card button {
+  width: 100%;
+}
+

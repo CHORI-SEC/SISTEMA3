@@ -97,3 +97,98 @@
     .menu-card h3 {
       margin: 10px 0;
       font-size: 1.4rem;
+    }
+
+    .menu-card p {
+      color: #7f8c8d;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body class="dashboard-body">
+
+  <nav class="navbar">
+    <div class="logo">
+      <strong>Sistema de Insumos</strong>
+    </div>
+    <div class="user-info">
+      <span id="welcomeText" style="color: white; font-weight: 500;">Cargando usuario...</span>
+      <button onclick="logout()" class="btn-logout">Cerrar Sesión</button>
+    </div>
+  </nav>
+
+  <div class="dashboard-container">
+    <header>
+      <h1>Panel de Control</h1>
+      <p>Bienvenido al sistema de gestión de mermas e insumos.</p>
+    </header>
+
+    <div class="menu-grid">
+      <a href="report.html" class="menu-card">
+        <div class="icon">📦</div>
+        <h3>Registrar Insumo</h3>
+        <p>Reportar productos dañados o realizar nuevos pedidos al supervisor.</p>
+      </a>
+
+      <a href="approve.html" id="adminCard" class="menu-card hidden">
+        <div class="icon">⚖️</div>
+        <h3>Aprobaciones</h3>
+        <p>Revisar y gestionar las solicitudes de insumos pendientes.</p>
+      </a>
+
+      <a href="history.html" class="menu-card">
+        <div class="icon">📋</div>
+        <h3>Historial</h3>
+        <p>Consulta el estado y los detalles de reportes anteriores.</p>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // --- LÓGICA INTEGRADA ---
+
+    // 1. Obtener sesión de localStorage
+    function getSession() {
+      const sessionData = localStorage.getItem("session");
+      return sessionData ? JSON.parse(sessionData) : null;
+    }
+
+    // 2. Cerrar sesión
+    function logout() {
+      localStorage.removeItem("session");
+      window.location.href = "index.html";
+    }
+
+    // 3. Inicialización al cargar el DOM
+    document.addEventListener("DOMContentLoaded", function() {
+      const session = getSession();
+
+      // Redirigir si no hay sesión activa
+      if (!session) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      // Actualizar saludo
+      const welcome = document.getElementById("welcomeText");
+      if (welcome) {
+        welcome.innerText = "Hola, " + session.user + " (" + session.role + ")";
+      }
+
+      // Mostrar tarjeta de Admin si corresponde
+      if (session.role === "admin") {
+        const adminCard = document.getElementById("adminCard");
+        if (adminCard) {
+          adminCard.classList.remove("hidden");
+          adminCard.style.display = "flex";
+        }
+      }
+    });
+  </script>
+</body>
+</html>

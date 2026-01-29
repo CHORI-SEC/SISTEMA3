@@ -3,31 +3,107 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ingreso al sistema</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <title>Login - Sistema de Insumos</title>
+  <style>
+    :root {
+      --primary: #2c3e50;
+      --accent: #3498db;
+      --bg: #f4f7f6;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--primary);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .login-card {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 350px;
+      text-align: center;
+    }
+
+    h2 { color: var(--primary); margin-bottom: 25px; }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      margin-top: 10px;
+      transition: background 0.3s;
+    }
+
+    button:hover { background-color: #2980b9; }
+
+    .error-msg { color: #e74c3c; font-size: 14px; margin-top: 10px; display: none; }
+  </style>
 </head>
+<body>
 
-<body class="login-body">
-
-  <div class="login-wrapper">
-    <div class="login-card">
-      <h1>Ingreso al sistema</h1>
-
-      <form onsubmit="login(); return false;">
-        <label>Usuario</label>
-        <input id="username" type="text" required>
-
-        <label>Contraseña</label>
-        <input id="password" type="password" required>
-
-        <button class="btn-primary" type="submit">
-          Ingresar
-        </button>
-      </form>
-
-    </div>
+  <div class="login-card">
+    <h2>Ingreso al Sistema</h2>
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Usuario (admin o almacen)" required>
+      <input type="password" id="password" placeholder="Contraseña (1234)" required>
+      <button type="submit">Entrar</button>
+      <div id="errorMsg" class="error-msg">Usuario o contraseña incorrectos</div>
+    </form>
   </div>
 
- </body>
-</html>
+  <script>
+    // LISTA DE USUARIOS
+    const users = [
+      { user: "admin", pass: "1234", role: "admin" },
+      { user: "almacen", pass: "1234", role: "almacen" }
+    ];
 
+    // MANEJO DEL FORMULARIO
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
+      // ESTO ES LO MÁS IMPORTANTE: Detiene la recarga de la página
+      event.preventDefault(); 
+
+      const u = document.getElementById("username").value;
+      const p = document.getElementById("password").value;
+      const errorDiv = document.getElementById("errorMsg");
+
+      // Buscar si el usuario existe
+      const found = users.find(x => x.user === u && x.pass === p);
+
+      if (found) {
+        // Guardar sesión y redirigir
+        localStorage.setItem("session", JSON.stringify(found));
+        window.location.href = "dashboard.html";
+      } else {
+        // Mostrar error sin recargar
+        errorDiv.style.display = "block";
+        setTimeout(() => { errorDiv.style.display = "none"; }, 3000);
+      }
+    });
+  </script>
+
+</body>
+</html>

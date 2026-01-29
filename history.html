@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Historial de Pedidos</title>
-  <link rel="stylesheet" href="css/styles.css" />
   <style>
     body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
     .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
@@ -48,29 +47,46 @@
     </table>
   </div>
 
-  <script src="js/app.js"></script>
   <script>
-    // Sobrescribimos ligeramente la función para que use la tabla
-    function loadHistoryTable() {
-      protectPage();
+    // --- LÓGICA UNIFICADA ---
+
+    document.addEventListener("DOMContentLoaded", function() {
+      // 1. Obtener sesión y datos
+      const session = JSON.parse(localStorage.getItem("session"));
+      const items = JSON.parse(localStorage.getItem("items")) || [];
+
+      // 2. Protección: Si no hay sesión, al login
+      if (!session) {
+        window.location.href = "index.html";
+        return;
+      }
+
       const container = document.getElementById("historyList");
       if (!container) return;
 
       container.innerHTML = "";
       
-      // Invertimos el array para ver lo más reciente primero
+      // 3. Invertir el array para ver lo más reciente primero
       const historyItems = [...items].reverse();
 
       if (historyItems.length === 0) {
-        container.innerHTML = "<tr><td colspan='5' style='text-align:center'>No hay registros aún</td></tr>";
+        container.innerHTML = "<tr><td colspan='5' style='text-align:center; padding: 20px; color: #999;'>No hay registros aún</td></tr>";
         return;
       }
 
+      // 4. Dibujar las filas de la tabla
       historyItems.forEach(i => {
         container.innerHTML += `
           <tr>
             <td><small>${i.date}</small></td>
-            <td><strong>${i.name}</strong></td>
+            <td><strong>${i.name}</strong><br><small style="color: #888;">${i.reason || ''}</small></td>
             <td>${i.qty}</td>
             <td><span class="badge badge-${i.status}">${i.status}</span></td>
-            <td>
+            <td>${i.reportedBy}</td>
+          </tr>
+        `;
+      });
+    });
+  </script>
+</body>
+</html>

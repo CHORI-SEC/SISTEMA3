@@ -1,4 +1,4 @@
-// ================= USUARIOS =================
+/ ================= USUARIOS =================
 const users = [
   { user: "admin", pass: "1234", role: "admin" },
   { user: "almacen", pass: "1234", role: "almacen" }
@@ -141,3 +141,4 @@ function loadHistory() {
       `;
     });
 }
+

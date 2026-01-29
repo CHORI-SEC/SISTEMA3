@@ -17,9 +17,6 @@ function login() {
   }
 
   localStorage.setItem("session", JSON.stringify(found));
-  console.log("Login exitoso para:", found.user);
-  
-  // Verifica que dashboard.html esté en la misma carpeta que index.html
   window.location.href = "dashboard.html";
 }
 
@@ -85,20 +82,28 @@ function loadPending() {
 
   container.innerHTML = "";
 
-  items
-    .filter(i => i.status === "pendiente")
-    .forEach(i => {
-      container.innerHTML += `
-        <div class="card-item">
-          <b>${i.name}</b> | Cantidad: ${i.qty}<br>
-          <small>Motivo: ${i.reason}</small><br>
-          <small>Reportado por: ${i.reportedBy}</small><br>
+  const pendingItems = items.filter(i => i.status === "pendiente");
+
+  if (pendingItems.length === 0) {
+    container.innerHTML = "<p style='text-align:center; color:#666;'>No hay solicitudes pendientes.</p>";
+    return;
+  }
+
+  pendingItems.forEach(i => {
+    container.innerHTML += `
+      <div class="card-item">
+        <div class="card-info">
+          <b>📦 ${i.name}</b>
+          <p>Cantidad: ${i.qty} | Reportado por: ${i.reportedBy}</p>
+          <small>Motivo: ${i.reason}</small>
+        </div>
+        <div class="card-actions">
           <button class="btn-approve" onclick="approve(${i.id})">Aprobar</button>
           <button class="btn-reject" onclick="reject(${i.id})">Rechazar</button>
-          <hr>
         </div>
-      `;
-    });
+      </div>
+    `;
+  });
 }
 
 function approve(id) {
@@ -117,33 +122,10 @@ function updateStatus(id, status) {
   );
 
   localStorage.setItem("items", JSON.stringify(items));
-  loadPending();
+  loadPending(); // Recarga la lista automáticamente
+}
 }
 
-// ================= HISTORIAL =================
-function loadHistory() {
-  protectPage();
-
-  const container = document.getElementById("historyList");
-  if (!container) return;
-
-  container.innerHTML = "";
-
-  items
-    .filter(i => i.status !== "pendiente")
-    .forEach(i => {
-      container.innerHTML += `
-        <div class="history-item">
-          <b>${i.name}</b> | ${i.qty}<br>
-          <span class="badge-${i.status}">Estado: ${i.status}</span><br>
-          <small>Reportado por: ${i.reportedBy}</small><br>
-          <small>Revisado por: ${i.reviewedBy || "-"}</small><br>
-          <small>Fecha: ${i.date}</small>
-          <hr>
-        </div>
-      `;
-    });
-}
 
 
 

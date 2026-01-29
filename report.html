@@ -46,7 +46,7 @@
       display: block;
       margin-bottom: 8px;
       font-weight: 600;
-      color: var(--secondary);
+      color: var(--primary);
     }
 
     input {
@@ -54,7 +54,7 @@
       padding: 12px;
       border: 1px solid #ddd;
       border-radius: 6px;
-      box-sizing: border-box; /* Evita que el input se salga del card */
+      box-sizing: border-box;
       font-size: 1rem;
     }
 
@@ -116,13 +116,50 @@
     <a href="dashboard.html" class="btn-back">Cancelar y Volver</a>
   </div>
 
-  <script src="js/app.js"></script>
   <script>
-    // Protegemos la página para que solo usuarios logueados entren
-    protectPage();
+    // --- LÓGICA INTEGRADA (SIN DEPENDER DE APP.JS) ---
 
-    // Conectamos el botón con la función addItem del app.js
-    document.getElementById("sendBtn").addEventListener("click", addItem);
+    // 1. Obtener la sesión actual
+    const session = JSON.parse(localStorage.getItem("session"));
+
+    // 2. Protección de página: si no hay sesión, al login
+    if (!session) {
+      window.location.href = "index.html";
+    }
+
+    // 3. Función para añadir el ítem
+    document.getElementById("sendBtn").addEventListener("click", function() {
+      const name = document.getElementById("name").value;
+      const qty = document.getElementById("qty").value;
+      const reason = document.getElementById("reason").value;
+
+      // Validación simple
+      if (!name || !qty || !reason) {
+        alert("Por favor, completa todos los campos.");
+        return;
+      }
+
+      // Obtener lista actual de items o crear una nueva
+      let items = JSON.parse(localStorage.getItem("items")) || [];
+
+      // Crear el reporte
+      const newItem = {
+        id: Date.now(),
+        name: name,
+        qty: qty,
+        reason: reason,
+        status: "pendiente",
+        date: new Date().toLocaleString(),
+        reportedBy: session.user
+      };
+
+      // Guardar
+      items.push(newItem);
+      localStorage.setItem("items", JSON.stringify(items));
+
+      alert("✅ Reporte enviado correctamente.");
+      window.location.href = "dashboard.html";
+    });
   </script>
 
 </body>

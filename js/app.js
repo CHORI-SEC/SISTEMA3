@@ -1,10 +1,10 @@
-/ ================= USUARIOS =================
+// ================= USUARIOS =================
 const users = [
   { user: "admin", pass: "1234", role: "admin" },
   { user: "almacen", pass: "1234", role: "almacen" }
 ];
 
-/ ================= SESIÓN =================
+// ================= SESIÓN =================
 function login() {
   const u = document.getElementById("username").value;
   const p = document.getElementById("password").value;
@@ -17,6 +17,9 @@ function login() {
   }
 
   localStorage.setItem("session", JSON.stringify(found));
+  console.log("Login exitoso para:", found.user);
+  
+  // Verifica que dashboard.html esté en la misma carpeta que index.html
   window.location.href = "dashboard.html";
 }
 
@@ -29,10 +32,10 @@ function logout() {
   window.location.href = "index.html";
 }
 
-/ ================= DATA =================
+// ================= DATA =================
 let items = JSON.parse(localStorage.getItem("items")) || [];
 
-/ ================= PROTECCIÓN DE PÁGINAS =================
+// ================= PROTECCIÓN DE PÁGINAS =================
 function protectPage(requiredRole = null) {
   const session = getSession();
 
@@ -47,7 +50,7 @@ function protectPage(requiredRole = null) {
   }
 }
 
-/ ================= REPORTAR =================
+// ================= REPORTAR =================
 function addItem() {
   const name = document.getElementById("name").value;
   const qty = document.getElementById("qty").value;
@@ -73,7 +76,7 @@ function addItem() {
   window.location.href = "dashboard.html";
 }
 
-/ ================= APROBACIÓN (SOLO ADMIN) =================
+// ================= APROBACIÓN (SOLO ADMIN) =================
 function loadPending() {
   protectPage("admin");
 
@@ -86,12 +89,12 @@ function loadPending() {
     .filter(i => i.status === "pendiente")
     .forEach(i => {
       container.innerHTML += `
-        <div>
+        <div class="card-item">
           <b>${i.name}</b> | Cantidad: ${i.qty}<br>
-          Motivo: ${i.reason}<br>
-          Reportado por: ${i.reportedBy}<br>
-          <button onclick="approve(${i.id})">Aprobar</button>
-          <button onclick="reject(${i.id})">Rechazar</button>
+          <small>Motivo: ${i.reason}</small><br>
+          <small>Reportado por: ${i.reportedBy}</small><br>
+          <button class="btn-approve" onclick="approve(${i.id})">Aprobar</button>
+          <button class="btn-reject" onclick="reject(${i.id})">Rechazar</button>
           <hr>
         </div>
       `;
@@ -117,7 +120,7 @@ function updateStatus(id, status) {
   loadPending();
 }
 
-/ ================= HISTORIAL =================
+// ================= HISTORIAL =================
 function loadHistory() {
   protectPage();
 
@@ -130,16 +133,17 @@ function loadHistory() {
     .filter(i => i.status !== "pendiente")
     .forEach(i => {
       container.innerHTML += `
-        <div>
+        <div class="history-item">
           <b>${i.name}</b> | ${i.qty}<br>
-          Estado: ${i.status}<br>
-          Reportado por: ${i.reportedBy}<br>
-          Revisado por: ${i.reviewedBy || "-"}<br>
-          Fecha: ${i.date}
+          <span class="badge-${i.status}">Estado: ${i.status}</span><br>
+          <small>Reportado por: ${i.reportedBy}</small><br>
+          <small>Revisado por: ${i.reviewedBy || "-"}</small><br>
+          <small>Fecha: ${i.date}</small>
           <hr>
         </div>
       `;
     });
 }
+
 
 

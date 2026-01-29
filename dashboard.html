@@ -1,16 +1,128 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Dashboard</title>
-  <link rel="stylesheet" href="css/styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Control - Sistema de Insumos</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* Estilos rápidos para que el Dashboard se vea profesional */
+    :root {
+      --primary: #2c3e50;
+      --secondary: #34495e;
+      --accent: #3498db;
+      --danger: #e74c3c;
+      --bg: #f4f7f6;
+    }
+
+    body.dashboard-body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg);
+    }
+
+    .navbar {
+      background-color: var(--primary);
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .btn-logout {
+      background-color: var(--danger);
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .dashboard-container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    header h1 {
+      color: var(--primary);
+      margin-bottom: 5px;
+    }
+
+    header p {
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    /* Grid de tarjetas */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .menu-card {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      text-decoration: none;
+      color: var(--primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      border: 1px solid #eee;
+    }
+
+    .menu-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      border-color: var(--accent);
+    }
+
+    .icon {
+      font-size: 50px;
+      margin-bottom: 15px;
+    }
+
+    .menu-card h3 {
+      margin: 10px 0;
+      font-size: 1.4rem;
+    }
+
+    .menu-card p {
+      color: #7f8c8d;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    /* Ocultar elementos según rol */
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
-<body>
-  <h2>Dashboard</h2>
+<body class="dashboard-body">
 
-  <a href="report.html">Registrar insumo dañado</a><br><br>
-  <a href="approve.html">Aprobaciones</a><br><br>
-  <a href="history.html">Historial</a>
+  <nav class="navbar">
+    <div class="logo">
+      <strong>Sistema de Insumos</strong>
+    </div>
+    <div class="user-info">
+      <span id="welcomeText">Cargando...</span>
+      <button onclick="logout()" class="btn-logout">Cerrar Sesión</button>
+    </div>
+  </nav>
 
-</body>
-</html>
+  <div class="dashboard-container">

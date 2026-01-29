@@ -1,126 +1,199 @@
-// ================= USUARIOS =================
-const users = [
-  { user: "admin", pass: "1234", role: "admin" },
-  { user: "almacen", pass: "1234", role: "almacen" }
-];
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Control - Sistema de Insumos</title>
+  <style>
+    :root {
+      --primary: #2c3e50;
+      --secondary: #34495e;
+      --accent: #3498db;
+      --danger: #e74c3c;
+      --bg: #f4f7f6;
+    }
 
-// ================= SESIÓN =================
-function login() {
-  const u = document.getElementById("username").value;
-  const p = document.getElementById("password").value;
+    body.dashboard-body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg);
+    }
 
-  const found = users.find(x => x.user === u && x.pass === p);
+    .navbar {
+      background-color: var(--primary);
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
 
-  if (!found) {
-    alert("Usuario o contraseña incorrectos");
-    return;
-  }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
 
-  localStorage.setItem("session", JSON.stringify(found));
-  window.location.href = "dashboard.html";
-}
+    .btn-logout {
+      background-color: var(--danger);
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
 
-function getSession() {
-  return JSON.parse(localStorage.getItem("session"));
-}
+    .dashboard-container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
 
-function logout() {
-  localStorage.removeItem("session");
-  window.location.href = "index.html";
-}
+    header h1 {
+      color: var(--primary);
+      margin-bottom: 5px;
+    }
 
-// ================= DATA =================
-let items = JSON.parse(localStorage.getItem("items")) || [];
+    header p {
+      color: #666;
+      margin-bottom: 30px;
+    }
 
-// ================= PROTECCIÓN DE PÁGINAS =================
-function protectPage(requiredRole = null) {
-  const session = getSession();
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
 
-  if (!session) {
-    window.location.href = "index.html";
-    return;
-  }
+    .menu-card {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      text-decoration: none;
+      color: var(--primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      border: 1px solid #eee;
+    }
 
-  if (requiredRole && session.role !== requiredRole) {
-    alert("No tienes permiso para acceder aquí");
-    window.location.href = "dashboard.html";
-  }
-}
+    .menu-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      border-color: var(--accent);
+    }
 
-// ================= REPORTAR =================
-function addItem() {
-  const name = document.getElementById("name").value;
-  const qty = document.getElementById("qty").value;
-  const reason = document.getElementById("reason").value;
+    .icon {
+      font-size: 50px;
+      margin-bottom: 15px;
+    }
 
-  if (!name || !qty || !reason) {
-    alert("Completa todos los campos");
-    return;
-  }
+    .menu-card h3 {
+      margin: 10px 0;
+      font-size: 1.4rem;
+    }
 
-  items.push({
-    id: Date.now(),
-    name: name,
-    qty: qty,
-    reason: reason,
-    status: "pendiente",
-    date: new Date().toLocaleString(),
-    reportedBy: getSession().user
-  });
+    .menu-card p {
+      color: #7f8c8d;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
 
-  localStorage.setItem("items", JSON.stringify(items));
-  alert("Insumo enviado a aprobación");
-  window.location.href = "dashboard.html";
-}
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body class="dashboard-body">
 
-// ================= APROBACIÓN (SOLO ADMIN) =================
-function loadPending() {
-  protectPage("admin");
+  <nav class="navbar">
+    <div class="logo">
+      <strong>Sistema de Insumos</strong>
+    </div>
+    <div class="user-info">
+      <span id="welcomeText" style="color: white;">Cargando usuario...</span>
+      <button onclick="logout()" class="btn-logout">Cerrar Sesión</button>
+    </div>
+  </nav>
 
-  const container = document.getElementById("pendingList");
-  if (!container) return;
+  <div class="dashboard-container">
+    <header>
+      <h1>Panel de Control</h1>
+      <p>Bienvenido al sistema de gestión de mermas e insumos.</p>
+    </header>
 
-  container.innerHTML = "";
+    <div class="menu-grid">
+      <a href="report.html" class="menu-card">
+        <div class="icon">📦</div>
+        <h3>Registrar Insumo</h3>
+        <p>Reportar productos dañados o realizar nuevos pedidos al supervisor.</p>
+      </a>
 
-  const pendingItems = items.filter(i => i.status === "pendiente");
+      <a href="approve.html" id="adminCard" class="menu-card hidden">
+        <div class="icon">⚖️</div>
+        <h3>Aprobaciones</h3>
+        <p>Revisar y gestionar las solicitudes de insumos pendientes.</p>
+      </a>
 
-  if (pendingItems.length === 0) {
-    container.innerHTML = "<p style='text-align:center; color:#666;'>No hay solicitudes pendientes.</p>";
-    return;
-  }
+      <a href="history.html" class="menu-card">
+        <div class="icon">📋</div>
+        <h3>Historial</h3>
+        <p>Consulta el estado y los detalles de reportes anteriores.</p>
+      </a>
+    </div>
+  </div>
 
-  pendingItems.forEach(i => {
-    container.innerHTML += `
-      <div class="card-item">
-        <div class="card-info">
-          <b>📦 ${i.name}</b>
-          <p>Cantidad: ${i.qty} | Reportado por: ${i.reportedBy}</p>
-          <small>Motivo: ${i.reason}</small>
-        </div>
-        <div class="card-actions">
-          <button class="btn-approve" onclick="approve(${i.id})">Aprobar</button>
-          <button class="btn-reject" onclick="reject(${i.id})">Rechazar</button>
-        </div>
-      </div>
-    `;
-  });
-}
+  <script>
+    // ================= CONFIGURACIÓN Y LÓGICA INTEGRADA =================
 
-function approve(id) {
-  updateStatus(id, "aprobado");
-}
+    const users = [
+      { user: "admin", pass: "1234", role: "admin" },
+      { user: "almacen", pass: "1234", role: "almacen" }
+    ];
 
-function reject(id) {
-  updateStatus(id, "rechazado");
-}
+    function getSession() {
+      const sessionData = localStorage.getItem("session");
+      return sessionData ? JSON.parse(sessionData) : null;
+    }
 
-function updateStatus(id, status) {
-  items = items.map(i =>
-    i.id === id
-      ? { ...i, status: status, reviewedBy: getSession().user }
-      : i
-  );
+    function logout() {
+      localStorage.removeItem("session");
+      window.location.href = "index.html";
+    }
 
-  localStorage.setItem("items", JSON.stringify(items));
-  loadPending();
-}
+    // Al cargar el Dashboard
+    document.addEventListener("DOMContentLoaded", function() {
+      const session = getSession();
+
+      // Seguridad: Si no hay sesión, volver al login
+      if (!session) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      // 1. Mostrar nombre de usuario
+      const welcome = document.getElementById("welcomeText");
+      if (welcome) {
+        welcome.innerText = `Hola, ${session.user} (${session.role})`;
+      }
+
+      // 2. Mostrar opciones de Admin
+      if (session.role === "admin") {
+        const adminCard = document.getElementById("adminCard");
+        if (adminCard) {
+          adminCard.classList.remove("hidden");
+          adminCard.style.display = "flex";
+        }
+      }
+    });
+
+    // Nota: Las funciones addItem, loadPending, approve, etc., 
+    // deben estar también en sus respectivos archivos .html o en un app.js compartido.
+  </script>
+</body>
+</html>

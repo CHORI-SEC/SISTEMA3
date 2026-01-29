@@ -30,5 +30,17 @@
     document.getElementById("loginBtn").addEventListener("click", login);
   </script>
 
+<script src="js/app.js"></script>
+<script>
+  console.log("JS cargado");
+
+  document.getElementById("loginBtn").addEventListener("click", function () {
+    console.log("Click detectado");
+    login();
+  });
+</script>
+
+  
 </body>
 </html>
+

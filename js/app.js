@@ -124,8 +124,3 @@ function updateStatus(id, status) {
   localStorage.setItem("items", JSON.stringify(items));
   loadPending(); // Recarga la lista automáticamente
 }
-}
-
-
-
-

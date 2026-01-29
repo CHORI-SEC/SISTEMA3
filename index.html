@@ -13,35 +13,22 @@
     <div class="login-card">
       <h1>Ingreso al sistema</h1>
 
-      <form id="loginForm">
-        <label>Usuario</label>
-        <input type="text" required>
+      <label>Usuario</label>
+      <input id="username" type="text">
 
-        <label>Contraseña</label>
-        <input type="password" required>
+      <label>Contraseña</label>
+      <input id="password" type="password">
 
-        <button class="btn-primary" type="submit">
-          Ingresar
-        </button>
-      </form>
+      <button id="loginBtn" class="btn-primary" type="button">
+        Ingresar
+      </button>
     </div>
   </div>
 
-<form onsubmit="login(); return false;">
-  <label>Usuario</label>
-  <input id="username" type="text" required>
-
-  <label>Contraseña</label>
-  <input id="password" type="password" required>
-
-  <button class="btn-primary" type="submit">Ingresar</button>
-</form>
-
-<script src="js/app.js"></script>
-
-    });
+  <script src="js/app.js"></script>
+  <script>
+    document.getElementById("loginBtn").addEventListener("click", login);
   </script>
 
 </body>
 </html>
-

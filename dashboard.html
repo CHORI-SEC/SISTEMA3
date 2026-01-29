@@ -6,7 +6,6 @@
   <title>Panel de Control - Sistema de Insumos</title>
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    /* Estilos rápidos para que el Dashboard se vea profesional */
     :root {
       --primary: #2c3e50;
       --secondary: #34495e;
@@ -63,7 +62,6 @@
       margin-bottom: 30px;
     }
 
-    /* Grid de tarjetas */
     .menu-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -107,9 +105,8 @@
       line-height: 1.4;
     }
 
-    /* Ocultar elementos según rol */
     .hidden {
-      display: none;
+      display: none !important;
     }
   </style>
 </head>
@@ -120,9 +117,37 @@
       <strong>Sistema de Insumos</strong>
     </div>
     <div class="user-info">
-      <span id="welcomeText">Cargando...</span>
+      <span id="welcomeText">Cargando usuario...</span>
       <button onclick="logout()" class="btn-logout">Cerrar Sesión</button>
     </div>
   </nav>
 
   <div class="dashboard-container">
+    <header>
+      <h1>Panel de Control</h1>
+      <p>Bienvenido al sistema de gestión de mermas e insumos.</p>
+    </header>
+
+    <div class="menu-grid">
+      <a href="report.html" class="menu-card">
+        <div class="icon">📦</div>
+        <h3>Registrar Insumo</h3>
+        <p>Reportar productos dañados o realizar nuevos pedidos al supervisor.</p>
+      </a>
+
+      <a href="approve.html" id="adminCard" class="menu-card hidden">
+        <div class="icon">⚖️</div>
+        <h3>Aprobaciones</h3>
+        <p>Revisar y gestionar las solicitudes de insumos pendientes.</p>
+      </a>
+
+      <a href="history.html" class="menu-card">
+        <div class="icon">📋</div>
+        <h3>Historial</h3>
+        <p>Consulta el estado y los detalles de reportes anteriores.</p>
+      </a>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+

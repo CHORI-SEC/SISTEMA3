@@ -4,7 +4,7 @@ const users = [
   { user: "almacen", pass: "1234", role: "almacen" }
 ];
 
-// ================= SESION =================
+// ================= SESIÓN =================
 function login() {
   const u = document.getElementById("username").value;
   const p = document.getElementById("password").value;
@@ -32,7 +32,7 @@ function logout() {
 // ================= DATA =================
 let items = JSON.parse(localStorage.getItem("items")) || [];
 
-// ================= PROTECCION DE PAGINAS =================
+// ================= PROTECCIÓN DE PÁGINAS =================
 function protectPage(requiredRole = null) {
   const session = getSession();
 
@@ -42,7 +42,7 @@ function protectPage(requiredRole = null) {
   }
 
   if (requiredRole && session.role !== requiredRole) {
-    alert("No tienes permiso para acceder aqui");
+    alert("No tienes permiso para acceder aquí");
     window.location.href = "dashboard.html";
   }
 }
@@ -60,20 +60,20 @@ function addItem() {
 
   items.push({
     id: Date.now(),
-    name,
-    qty,
-    reason,
+    name: name,
+    qty: qty,
+    reason: reason,
     status: "pendiente",
     date: new Date().toLocaleString(),
     reportedBy: getSession().user
   });
 
   localStorage.setItem("items", JSON.stringify(items));
-  alert("Insumo enviado a aprobacion");
+  alert("Insumo enviado a aprobación");
   window.location.href = "dashboard.html";
 }
 
-// ================= APROBACION (SOLO ADMIN) =================
+// ================= APROBACIÓN (SOLO ADMIN) =================
 function loadPending() {
   protectPage("admin");
 
@@ -93,7 +93,7 @@ function loadPending() {
     container.innerHTML += `
       <div class="card-item">
         <div class="card-info">
-          <b>Insumo: ${i.name}</b>
+          <b>📦 ${i.name}</b>
           <p>Cantidad: ${i.qty} | Reportado por: ${i.reportedBy}</p>
           <small>Motivo: ${i.reason}</small>
         </div>
@@ -117,10 +117,10 @@ function reject(id) {
 function updateStatus(id, status) {
   items = items.map(i =>
     i.id === id
-      ? { ...i, status, reviewedBy: getSession().user }
+      ? { ...i, status: status, reviewedBy: getSession().user }
       : i
   );
 
   localStorage.setItem("items", JSON.stringify(items));
-  loadPending(); 
+  loadPending();
 }

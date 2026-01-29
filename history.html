@@ -2,36 +2,75 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Historial</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Historial de Pedidos</title>
   <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
+    .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    
+    .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+    
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th { background-color: #2c3e50; color: white; text-align: left; padding: 12px; }
+    td { padding: 12px; border-bottom: 1px solid #eee; color: #444; }
+    tr:hover { background-color: #f9f9f9; }
+
+    /* Badges de estado */
+    .badge { padding: 5px 10px; border-radius: 15px; font-size: 0.85rem; font-weight: bold; text-transform: capitalize; }
+    .badge-aprobado { background: #d4edda; color: #155724; }
+    .badge-rechazado { background: #f8d7da; color: #721c24; }
+    .badge-pendiente { background: #fff3cd; color: #856404; }
+
+    .btn-back { text-decoration: none; color: #3498db; font-weight: bold; }
+  </style>
 </head>
 <body>
-  <h2>Historial de daños</h2>
 
-  <h2>Historial</h2>
+  <div class="container">
+    <div class="header-flex">
+      <h1>Historial de Insumos</h1>
+      <a href="dashboard.html" class="btn-back">← Volver al Panel</a>
+    </div>
 
-<div id="historyList"></div>
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Insumo</th>
+          <th>Cant.</th>
+          <th>Estado</th>
+          <th>Usuario</th>
+        </tr>
+      </thead>
+      <tbody id="historyList">
+        </tbody>
+    </table>
+  </div>
 
-<script src="js/app.js"></script>
-<script>
-  loadHistory();
-</script>
+  <script src="js/app.js"></script>
+  <script>
+    // Sobrescribimos ligeramente la función para que use la tabla
+    function loadHistoryTable() {
+      protectPage();
+      const container = document.getElementById("historyList");
+      if (!container) return;
 
+      container.innerHTML = "";
+      
+      // Invertimos el array para ver lo más reciente primero
+      const historyItems = [...items].reverse();
 
-  <table>
-    <tr>
-      <th>Fecha</th>
-      <th>Insumo</th>
-      <th>Cantidad</th>
-      <th>Estado</th>
-    </tr>
-    <tr>
-      <td>20/01</td>
-      <td>Botella</td>
-      <td>5</td>
-      <td>Aprobado</td>
-    </tr>
-  </table>
-</body>
-</html>
+      if (historyItems.length === 0) {
+        container.innerHTML = "<tr><td colspan='5' style='text-align:center'>No hay registros aún</td></tr>";
+        return;
+      }
 
+      historyItems.forEach(i => {
+        container.innerHTML += `
+          <tr>
+            <td><small>${i.date}</small></td>
+            <td><strong>${i.name}</strong></td>
+            <td>${i.qty}</td>
+            <td><span class="badge badge-${i.status}">${i.status}</span></td>
+            <td>

@@ -4,7 +4,7 @@ const users = [
   { user: "almacen", pass: "1234", role: "almacen" }
 ];
 
-// ================= SESIÓN =================
+// ================= SESION =================
 function login() {
   const u = document.getElementById("username").value;
   const p = document.getElementById("password").value;
@@ -32,7 +32,7 @@ function logout() {
 // ================= DATA =================
 let items = JSON.parse(localStorage.getItem("items")) || [];
 
-// ================= PROTECCIÓN DE PÁGINAS =================
+// ================= PROTECCION DE PAGINAS =================
 function protectPage(requiredRole = null) {
   const session = getSession();
 
@@ -42,7 +42,7 @@ function protectPage(requiredRole = null) {
   }
 
   if (requiredRole && session.role !== requiredRole) {
-    alert("No tienes permiso para acceder aquí");
+    alert("No tienes permiso para acceder aqui");
     window.location.href = "dashboard.html";
   }
 }
@@ -69,11 +69,11 @@ function addItem() {
   });
 
   localStorage.setItem("items", JSON.stringify(items));
-  alert("Insumo enviado a aprobación");
+  alert("Insumo enviado a aprobacion");
   window.location.href = "dashboard.html";
 }
 
-// ================= APROBACIÓN (SOLO ADMIN) =================
+// ================= APROBACION (SOLO ADMIN) =================
 function loadPending() {
   protectPage("admin");
 
@@ -93,7 +93,7 @@ function loadPending() {
     container.innerHTML += `
       <div class="card-item">
         <div class="card-info">
-          <b>📦 ${i.name}</b>
+          <b>Insumo: ${i.name}</b>
           <p>Cantidad: ${i.qty} | Reportado por: ${i.reportedBy}</p>
           <small>Motivo: ${i.reason}</small>
         </div>
@@ -122,5 +122,5 @@ function updateStatus(id, status) {
   );
 
   localStorage.setItem("items", JSON.stringify(items));
-  loadPending(); // Recarga la lista automáticamente
+  loadPending(); 
 }

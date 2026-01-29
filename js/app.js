@@ -150,39 +150,49 @@
 
   <script>
     // ================= CONFIGURACIÓN Y LÓGICA INTEGRADA =================
-
+    
+    // Base de datos de usuarios
     const users = [
       { user: "admin", pass: "1234", role: "admin" },
       { user: "almacen", pass: "1234", role: "almacen" }
     ];
 
+    // Carga de ítems desde memoria local
+    let items = JSON.parse(localStorage.getItem("items")) || [];
+
+    // Función para obtener la sesión actual
     function getSession() {
       const sessionData = localStorage.getItem("session");
-      return sessionData ? JSON.parse(sessionData) : null;
+      try {
+        return sessionData ? JSON.parse(sessionData) : null;
+      } catch (e) {
+        return null;
+      }
     }
 
+    // Función para cerrar sesión
     function logout() {
       localStorage.removeItem("session");
       window.location.href = "index.html";
     }
 
-    // Al cargar el Dashboard
+    // Inicialización del Dashboard
     document.addEventListener("DOMContentLoaded", function() {
       const session = getSession();
 
-      // Seguridad: Si no hay sesión, volver al login
+      // Redirigir al login si no hay sesión
       if (!session) {
         window.location.href = "index.html";
         return;
       }
 
-      // 1. Mostrar nombre de usuario
+      // Mostrar nombre y rol
       const welcome = document.getElementById("welcomeText");
       if (welcome) {
         welcome.innerText = `Hola, ${session.user} (${session.role})`;
       }
 
-      // 2. Mostrar opciones de Admin
+      // Lógica de visibilidad para Admin
       if (session.role === "admin") {
         const adminCard = document.getElementById("adminCard");
         if (adminCard) {
@@ -192,8 +202,10 @@
       }
     });
 
-    // Nota: Las funciones addItem, loadPending, approve, etc., 
-    // deben estar también en sus respectivos archivos .html o en un app.js compartido.
+    // Funciones globales compartidas (para que otros archivos puedan usarlas si heredas este JS)
+    window.logout = logout;
+    window.getSession = getSession;
   </script>
 </body>
 </html>
+

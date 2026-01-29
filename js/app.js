@@ -4,7 +4,7 @@ const users = [
   { user: "almacen", pass: "1234", role: "almacen" }
 ];
 
-// ================= SESIÓN =================
+/ ================= SESIÓN =================
 function login() {
   const u = document.getElementById("username").value;
   const p = document.getElementById("password").value;
@@ -29,10 +29,10 @@ function logout() {
   window.location.href = "index.html";
 }
 
-// ================= DATA =================
+/ ================= DATA =================
 let items = JSON.parse(localStorage.getItem("items")) || [];
 
-// ================= PROTECCIÓN DE PÁGINAS =================
+/ ================= PROTECCIÓN DE PÁGINAS =================
 function protectPage(requiredRole = null) {
   const session = getSession();
 
@@ -47,7 +47,7 @@ function protectPage(requiredRole = null) {
   }
 }
 
-// ================= REPORTAR =================
+/ ================= REPORTAR =================
 function addItem() {
   const name = document.getElementById("name").value;
   const qty = document.getElementById("qty").value;
@@ -73,7 +73,7 @@ function addItem() {
   window.location.href = "dashboard.html";
 }
 
-// ================= APROBACIÓN (SOLO ADMIN) =================
+/ ================= APROBACIÓN (SOLO ADMIN) =================
 function loadPending() {
   protectPage("admin");
 
@@ -117,7 +117,7 @@ function updateStatus(id, status) {
   loadPending();
 }
 
-// ================= HISTORIAL =================
+/ ================= HISTORIAL =================
 function loadHistory() {
   protectPage();
 
@@ -141,4 +141,5 @@ function loadHistory() {
       `;
     });
 }
+
 

@@ -2,27 +2,91 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Aprobaciones</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aprobaciones - Panel de Supervisor</title>
   <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* Estilos específicos para las tarjetas de aprobación */
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f7f6;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .header-area {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    /* Estilo de la Tarjeta Dinámica */
+    .card-item {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      border-left: 6px solid #3498db; /* Azul para indicar 'pendiente' */
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-content b {
+      font-size: 1.2rem;
+      color: #2c3e50;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .card-content p {
+      margin: 2px 0;
+      color: #555;
+    }
+
+    /* Botones de acción */
+    .btn-approve {
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    .btn-reject {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .btn-approve:hover { background-color: #219150; }
+    .btn-reject:hover { background-color: #c0392b; }
+
+    .link-back {
+      text-decoration: none;
+      color: #3498db;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-  <h2>Solicitudes pendientes</h2>
 
-  <h2>Insumos Pendientes</h2>
-
-<div id="pendingList"></div>
-
-<script src="js/app.js"></script>
-<script>
-  loadPending();
-</script>
-
-  <div class="card">
-    <p>Insumo: Vaso 12oz</p>
-    <p>Cantidad: 10</p>
-    <button>Aprobar</button>
-    <button>Rechazar</button>
-  </div>
-</body>
-</html>
-
+  <div class="container">
+    <div class="header-area">
+      <h2>Insumos Pendientes de Aprobación</h2>
+      <a href="dashboard.html" class="link-back">← Volver al Panel</a>
+    </div>

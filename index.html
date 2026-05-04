@@ -74,36 +74,26 @@
     </form>
   </div>
 
-  <script>
-    // LISTA DE USUARIOS
-    const users = [
-      { user: "admin", pass: "1234", role: "admin" },
-      { user: "almacen", pass: "1234", role: "almacen" }
-    ];
+<script type="module">
+import { auth } from "./firebase.js";
+import { signInWithEmailAndPassword } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-    // MANEJO DEL FORMULARIO
-    document.getElementById("loginForm").addEventListener("submit", function(event) {
-      // ESTO ES LO MÁS IMPORTANTE: Detiene la recarga de la página
-      event.preventDefault(); 
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-      const u = document.getElementById("username").value;
-      const p = document.getElementById("password").value;
-      const errorDiv = document.getElementById("errorMsg");
+  const email = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
 
-      // Buscar si el usuario existe
-      const found = users.find(x => x.user === u && x.pass === p);
-
-      if (found) {
-        // Guardar sesión y redirigir
-        localStorage.setItem("session", JSON.stringify(found));
-        window.location.href = "dashboard.html";
-      } else {
-        // Mostrar error sin recargar
-        errorDiv.style.display = "block";
-        setTimeout(() => { errorDiv.style.display = "none"; }, 3000);
-      }
-    });
-  </script>
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    window.location.href = "dashboard.html";
+  } catch (error) {
+    alert("Login incorrecto");
+    console.error(error);
+  }
+});
+</script>
 
 </body>
 </html>

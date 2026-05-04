@@ -1,14 +1,13 @@
 <script type="module">
 import { auth, db } from "./firebase.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 document.addEventListener("DOMContentLoaded", () => {
 
   const welcome = document.getElementById("welcomeText");
-  const logoutBtn = document.getElementById("logoutBtn");
   const adminCard = document.getElementById("adminCard");
 
+  // 🔐 Verificar usuario autenticado
   auth.onAuthStateChanged(async (user) => {
 
     if (!user) {
@@ -16,35 +15,42 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    welcome.innerText = "Hola, " + user.email;
-
     try {
-      // 🔥 Leer rol desde Firestore
+      // 🔥 Obtener rol desde Firestore
       const userRef = doc(db, "users", user.uid);
       const userSnap = await getDoc(userRef);
 
       if (!userSnap.exists()) {
-        console.error("Usuario sin rol en Firestore");
+        alert("Usuario sin rol asignado");
         return;
       }
 
-      const userData = userSnap.data();
+      const data = userSnap.data();
 
-      // 🎯 CONTROL REAL DE ROLES
-      if (userData.role === "admin") {
+      // 👤 Mostrar info
+      if (welcome) {
+        welcome.innerText = `Hola, ${data.email} (${data.role})`;
+      }
+
+      // 🔑 Mostrar panel admin solo si corresponde
+      if (data.role === "admin" && adminCard) {
         adminCard.classList.remove("hidden");
+        adminCard.style.display = "flex";
       }
 
     } catch (error) {
-      console.error("Error obteniendo rol:", error);
+      console.error(error);
+      alert("Error cargando usuario");
     }
 
   });
 
-  logoutBtn.addEventListener("click", async () => {
-    await signOut(auth);
+});
+
+// 🚪 Logout GLOBAL (fuera del DOMContentLoaded)
+window.logout = function() {
+  auth.signOut().then(() => {
     window.location.href = "index.html";
   });
-
-});
+};
 </script>

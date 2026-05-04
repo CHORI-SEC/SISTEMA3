@@ -10,6 +10,7 @@ const firebaseConfig = {
   messagingSenderId: "959096355892",
   appId: "1:959096355892:web:d17d4e02390334867bde61",
   measurementId: "G-5YWCZXXTSW"
+}; // ← ESTO FALTABA
 
 const app = initializeApp(firebaseConfig);
 

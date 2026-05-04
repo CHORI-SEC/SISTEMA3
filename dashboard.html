@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel de Control - Sistema de Insumos</title>
   <link rel="stylesheet" href="css/styles.css">
+
   <style>
     :root {
       --primary: #2c3e50;
@@ -16,7 +17,7 @@
 
     body.dashboard-body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       background-color: var(--bg);
     }
 
@@ -27,7 +28,6 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
     .user-info {
@@ -52,16 +52,6 @@
       padding: 0 20px;
     }
 
-    header h1 {
-      color: var(--primary);
-      margin-bottom: 5px;
-    }
-
-    header p {
-      color: #666;
-      margin-bottom: 30px;
-    }
-
     .menu-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -74,35 +64,8 @@
       padding: 30px;
       text-decoration: none;
       color: var(--primary);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       text-align: center;
-      transition: all 0.3s ease;
       box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-      border: 1px solid #eee;
-    }
-
-    .menu-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-      border-color: var(--accent);
-    }
-
-    .icon {
-      font-size: 50px;
-      margin-bottom: 15px;
-    }
-
-    .menu-card h3 {
-      margin: 10px 0;
-      font-size: 1.4rem;
-    }
-
-    .menu-card p {
-      color: #7f8c8d;
-      font-size: 0.9rem;
-      line-height: 1.4;
     }
 
     .hidden {
@@ -110,85 +73,72 @@
     }
   </style>
 </head>
+
 <body class="dashboard-body">
 
   <nav class="navbar">
-    <div class="logo">
-      <strong>Sistema de Insumos</strong>
-    </div>
+    <div><strong>Sistema de Insumos</strong></div>
     <div class="user-info">
-      <span id="welcomeText" style="color: white; font-weight: 500;">Cargando usuario...</span>
-      <button onclick="logout()" class="btn-logout">Cerrar Sesión</button>
+      <span id="welcomeText">Cargando...</span>
+      <button id="logoutBtn" class="btn-logout">Cerrar Sesión</button>
     </div>
   </nav>
 
   <div class="dashboard-container">
-    <header>
-      <h1>Panel de Control</h1>
-      <p>Bienvenido al sistema de gestión de mermas e insumos.</p>
-    </header>
+    <h1>Panel de Control</h1>
 
     <div class="menu-grid">
       <a href="report.html" class="menu-card">
-        <div class="icon">📦</div>
-        <h3>Registrar Insumo</h3>
-        <p>Reportar productos dañados o realizar nuevos pedidos al supervisor.</p>
+        <h3>📦 Registrar Insumo</h3>
       </a>
 
       <a href="approve.html" id="adminCard" class="menu-card hidden">
-        <div class="icon">⚖️</div>
-        <h3>Aprobaciones</h3>
-        <p>Revisar y gestionar las solicitudes de insumos pendientes.</p>
+        <h3>⚖️ Aprobaciones</h3>
       </a>
 
       <a href="history.html" class="menu-card">
-        <div class="icon">📋</div>
-        <h3>Historial</h3>
-        <p>Consulta el estado y los detalles de reportes anteriores.</p>
+        <h3>📋 Historial</h3>
       </a>
     </div>
   </div>
 
-  <script>
-    // --- LÓGICA INTEGRADA ---
+  <!-- 🔥 FIREBASE SCRIPT -->
+  <script type="module">
+    import { auth } from "./firebase.js";
+    import { signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-    // 1. Obtener sesión de localStorage
-    function getSession() {
-      const sessionData = localStorage.getItem("session");
-      return sessionData ? JSON.parse(sessionData) : null;
-    }
+    document.addEventListener("DOMContentLoaded", () => {
 
-    // 2. Cerrar sesión
-    function logout() {
-      localStorage.removeItem("session");
-      window.location.href = "index.html";
-    }
-
-    // 3. Inicialización al cargar el DOM
-    document.addEventListener("DOMContentLoaded", function() {
-      const session = getSession();
-
-      // Redirigir si no hay sesión activa
-      if (!session) {
-        window.location.href = "index.html";
-        return;
-      }
-
-      // Actualizar saludo
       const welcome = document.getElementById("welcomeText");
-      if (welcome) {
-        welcome.innerText = "Hola, " + session.user + " (" + session.role + ")";
-      }
+      const logoutBtn = document.getElementById("logoutBtn");
+      const adminCard = document.getElementById("adminCard");
 
-      // Mostrar tarjeta de Admin si corresponde
-      if (session.role === "admin") {
-        const adminCard = document.getElementById("adminCard");
-        if (adminCard) {
-          adminCard.classList.remove("hidden");
-          adminCard.style.display = "flex";
+      // 🔐 Control de sesión REAL (Firebase)
+      auth.onAuthStateChanged(user => {
+
+        if (!user) {
+          window.location.href = "index.html";
+          return;
         }
-      }
+
+        // Mostrar usuario
+        welcome.innerText = "Hola, " + user.email;
+
+        // ⚠️ TEMPORAL (luego lo hacemos con Firestore roles)
+        if (user.email === "admin@gmail.com") {
+          adminCard.classList.remove("hidden");
+        }
+
+      });
+
+      // 🔓 Logout real
+      logoutBtn.addEventListener("click", async () => {
+        await signOut(auth);
+        window.location.href = "index.html";
+      });
+
     });
   </script>
+
 </body>
 </html>

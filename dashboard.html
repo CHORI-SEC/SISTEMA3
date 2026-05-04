@@ -1,144 +1,50 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel de Control - Sistema de Insumos</title>
-  <link rel="stylesheet" href="css/styles.css">
+<script type="module">
+import { auth, db } from "./firebase.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-  <style>
-    :root {
-      --primary: #2c3e50;
-      --secondary: #34495e;
-      --accent: #3498db;
-      --danger: #e74c3c;
-      --bg: #f4f7f6;
+document.addEventListener("DOMContentLoaded", () => {
+
+  const welcome = document.getElementById("welcomeText");
+  const logoutBtn = document.getElementById("logoutBtn");
+  const adminCard = document.getElementById("adminCard");
+
+  auth.onAuthStateChanged(async (user) => {
+
+    if (!user) {
+      window.location.href = "index.html";
+      return;
     }
 
-    body.dashboard-body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: var(--bg);
+    welcome.innerText = "Hola, " + user.email;
+
+    try {
+      // 🔥 Leer rol desde Firestore
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        console.error("Usuario sin rol en Firestore");
+        return;
+      }
+
+      const userData = userSnap.data();
+
+      // 🎯 CONTROL REAL DE ROLES
+      if (userData.role === "admin") {
+        adminCard.classList.remove("hidden");
+      }
+
+    } catch (error) {
+      console.error("Error obteniendo rol:", error);
     }
 
-    .navbar {
-      background-color: var(--primary);
-      color: white;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+  });
 
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
+  logoutBtn.addEventListener("click", async () => {
+    await signOut(auth);
+    window.location.href = "index.html";
+  });
 
-    .btn-logout {
-      background-color: var(--danger);
-      color: white;
-      border: none;
-      padding: 8px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .dashboard-container {
-      max-width: 1000px;
-      margin: 40px auto;
-      padding: 0 20px;
-    }
-
-    .menu-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-    }
-
-    .menu-card {
-      background: white;
-      border-radius: 12px;
-      padding: 30px;
-      text-decoration: none;
-      color: var(--primary);
-      text-align: center;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    }
-
-    .hidden {
-      display: none !important;
-    }
-  </style>
-</head>
-
-<body class="dashboard-body">
-
-  <nav class="navbar">
-    <div><strong>Sistema de Insumos</strong></div>
-    <div class="user-info">
-      <span id="welcomeText">Cargando...</span>
-      <button id="logoutBtn" class="btn-logout">Cerrar Sesión</button>
-    </div>
-  </nav>
-
-  <div class="dashboard-container">
-    <h1>Panel de Control</h1>
-
-    <div class="menu-grid">
-      <a href="report.html" class="menu-card">
-        <h3>📦 Registrar Insumo</h3>
-      </a>
-
-      <a href="approve.html" id="adminCard" class="menu-card hidden">
-        <h3>⚖️ Aprobaciones</h3>
-      </a>
-
-      <a href="history.html" class="menu-card">
-        <h3>📋 Historial</h3>
-      </a>
-    </div>
-  </div>
-
-  <!-- 🔥 FIREBASE SCRIPT -->
-  <script type="module">
-    import { auth } from "./firebase.js";
-    import { signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-    document.addEventListener("DOMContentLoaded", () => {
-
-      const welcome = document.getElementById("welcomeText");
-      const logoutBtn = document.getElementById("logoutBtn");
-      const adminCard = document.getElementById("adminCard");
-
-      // 🔐 Control de sesión REAL (Firebase)
-      auth.onAuthStateChanged(user => {
-
-        if (!user) {
-          window.location.href = "index.html";
-          return;
-        }
-
-        // Mostrar usuario
-        welcome.innerText = "Hola, " + user.email;
-
-        // ⚠️ TEMPORAL (luego lo hacemos con Firestore roles)
-        if (user.email === "admin@gmail.com") {
-          adminCard.classList.remove("hidden");
-        }
-
-      });
-
-      // 🔓 Logout real
-      logoutBtn.addEventListener("click", async () => {
-        await signOut(auth);
-        window.location.href = "index.html";
-      });
-
-    });
-  </script>
-
-</body>
-</html>
+});
+</script>

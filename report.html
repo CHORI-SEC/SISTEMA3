@@ -139,8 +139,6 @@
         return;
       }
 
-      // Obtener lista actual de items o crear una nueva
-      let items = JSON.parse(localStorage.getItem("items")) || [];
 
       // Crear el reporte
       const newItem = {
@@ -155,8 +153,7 @@
 
       // Guardar
       items.push(newItem);
-      localStorage.setItem("items", JSON.stringify(items));
-
+     
       alert("✅ Reporte enviado correctamente.");
       window.location.href = "dashboard.html";
     });

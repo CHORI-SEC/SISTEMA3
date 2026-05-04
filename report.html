@@ -1,168 +1,9 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reportar Insumo - Sistema de Pedidos</title>
-  <link rel="stylesheet" href="css/styles.css">
-  <style>
-    :root {
-      --primary: #2c3e50;
-      --accent: #3498db;
-      --bg: #f4f7f6;
-    }
-
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: var(--bg);
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    .form-card {
-      background: white;
-      padding: 40px;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 400px;
-    }
-
-    h2 {
-      color: var(--primary);
-      margin-top: 0;
-      text-align: center;
-      margin-bottom: 25px;
-    }
-
-    .input-group {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: var(--primary);
-    }
-
-    input {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      box-sizing: border-box;
-      font-size: 1rem;
-    }
-
-    input:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
-    }
-
-    .btn-submit {
-      width: 100%;
-      background-color: var(--accent);
-      color: white;
-      border: none;
-      padding: 14px;
-      border-radius: 6px;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .btn-submit:hover {
-      background-color: #2980b9;
-    }
-
-    .btn-back {
-      display: block;
-      text-align: center;
-      margin-top: 20px;
-      text-decoration: none;
-      color: #7f8c8d;
-      font-size: 0.9rem;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="form-card">
-    <h2>Nuevo Reporte</h2>
-
-    <div class="input-group">
-      <label for="name">Insumo</label>
-      <input id="name" type="text" placeholder="Ej: Vasos 12oz">
-    </div>
-
-    <div class="input-group">
-      <label for="qty">Cantidad</label>
-      <input id="qty" type="number" placeholder="0">
-    </div>
-
-    <div class="input-group">
-      <label for="reason">Motivo / Observación</label>
-      <input id="reason" type="text" placeholder="Ej: Roto o faltante">
-    </div>
-
-    <button id="sendBtn" class="btn-submit">Enviar a Revisión</button>
-    
-    <a href="dashboard.html" class="btn-back">Cancelar y Volver</a>
-  </div>
-
-  <script>
-    // --- LÓGICA INTEGRADA (SIN DEPENDER DE APP.JS) ---
-
-    // 1. Obtener la sesión actual
-    const session = JSON.parse(localStorage.getItem("session"));
-
-    // 2. Protección de página: si no hay sesión, al login
-    if (!session) {
-      window.location.href = "index.html";
-    }
-
-    // 3. Función para añadir el ítem
-    document.getElementById("sendBtn").addEventListener("click", function() {
-      const name = document.getElementById("name").value;
-      const qty = document.getElementById("qty").value;
-      const reason = document.getElementById("reason").value;
-
-      // Validación simple
-      if (!name || !qty || !reason) {
-        alert("Por favor, completa todos los campos.");
-        return;
-      }
-
-
-      // Crear el reporte
-      const newItem = {
-        id: Date.now(),
-        name: name,
-        qty: qty,
-        reason: reason,
-        status: "pendiente",
-        date: new Date().toLocaleString(),
-        reportedBy: session.user
-      };
-
-      // Guardar
-      items.push(newItem);
-     
-      alert("✅ Reporte enviado correctamente.");
-      window.location.href = "dashboard.html";
-    });
 <script type="module">
 import { auth, db } from "./firebase.js";
 import { addDoc, collection, serverTimestamp } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// Verificar usuario
+// 🔐 Verificar usuario con Firebase (NO localStorage)
 auth.onAuthStateChanged(user => {
   if (!user) {
     window.location.href = "index.html";
@@ -181,8 +22,6 @@ document.getElementById("sendBtn").addEventListener("click", async () => {
   }
 
   try {
-
-    // 👉 AQUÍ va tu código (NO en una línea suelta)
     await addDoc(collection(db, "items"), {
       name,
       qty,
@@ -193,7 +32,7 @@ document.getElementById("sendBtn").addEventListener("click", async () => {
       userEmail: auth.currentUser.email
     });
 
-    alert("Pedido guardado");
+    alert("✅ Pedido guardado");
     window.location.href = "dashboard.html";
 
   } catch (error) {
@@ -202,6 +41,4 @@ document.getElementById("sendBtn").addEventListener("click", async () => {
   }
 
 });
-
-</body>
-</html>
+</script>

@@ -1,171 +1,107 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aprobaciones - Panel de Supervisor</title>
-  <link rel="stylesheet" href="css/styles.css" />
-  <style>
-    /* Tus estilos originales */
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f7f6;
-      margin: 0;
-      padding: 20px;
+<script type="module">
+import { auth, db } from "./firebase.js";
+import { 
+  collection, getDocs, updateDoc, doc 
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// 🔐 Verificar usuario y rol
+auth.onAuthStateChanged(async (user) => {
+
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  // 🔥 Verificar rol en Firestore
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDocs(collection(db, "users"));
+
+  let isAdmin = false;
+
+  userSnap.forEach(docu => {
+    if (docu.id === user.uid && docu.data().role === "admin") {
+      isAdmin = true;
     }
+  });
 
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
+  if (!isAdmin) {
+    alert("Acceso denegado");
+    window.location.href = "dashboard.html";
+    return;
+  }
+
+  // ✅ Si es admin → cargar pedidos
+  loadPending();
+
+});
+
+// 🔥 Cargar pedidos desde Firestore
+async function loadPending() {
+  const listContainer = document.getElementById("pendingList");
+  listContainer.innerHTML = "";
+
+  const querySnapshot = await getDocs(collection(db, "items"));
+
+  let hasItems = false;
+
+  querySnapshot.forEach(docSnap => {
+    const item = docSnap.data();
+
+    if (item.status === "pendiente") {
+      hasItems = true;
+
+      const card = document.createElement("div");
+      card.className = "card-item";
+
+      card.innerHTML = `
+        <div class="card-content">
+          <b>📦 ${item.name}</b>
+          <p>Cantidad: ${item.qty}</p>
+          <p><small>${item.userEmail || ""}</small></p>
+          <p><i>${item.reason}</i></p>
+        </div>
+        <div class="card-actions">
+          <button class="btn-approve" data-id="${docSnap.id}" data-status="aprobado">Aprobar</button>
+          <button class="btn-reject" data-id="${docSnap.id}" data-status="rechazado">Rechazar</button>
+        </div>
+      `;
+
+      listContainer.appendChild(card);
     }
+  });
 
-    .header-area {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-    }
+  if (!hasItems) {
+    listContainer.innerHTML = '<p class="empty-state">No hay solicitudes esperando aprobación.</p>';
+  }
 
-    .card-item {
-      background: white;
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-      border-left: 6px solid #3498db;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+  // 🎯 Eventos botones
+  document.querySelectorAll(".btn-approve, .btn-reject").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      const id = e.target.dataset.id;
+      const status = e.target.dataset.status;
 
-    .card-content b {
-      font-size: 1.2rem;
-      color: #2c3e50;
-      display: block;
-      margin-bottom: 5px;
-    }
+      await updateStatus(id, status);
+    });
+  });
+}
 
-    .card-content p {
-      margin: 2px 0;
-      color: #555;
-    }
+// 🔥 Actualizar estado en Firestore
+async function updateStatus(id, newStatus) {
+  try {
+    const itemRef = doc(db, "items", id);
 
-    .btn-approve {
-      background-color: #27ae60;
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-      margin-right: 10px;
-    }
+    await updateDoc(itemRef, {
+      status: newStatus,
+      reviewedAt: new Date().toISOString()
+    });
 
-    .btn-reject {
-      background-color: #e74c3c;
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-    }
+    alert("Registro " + newStatus);
 
-    .btn-approve:hover { background-color: #219150; }
-    .btn-reject:hover { background-color: #c0392b; }
+    loadPending(); // refrescar
 
-    .link-back {
-      text-decoration: none;
-      color: #3498db;
-      font-weight: bold;
-    }
-
-    .empty-state {
-      text-align: center;
-      color: #7f8c8d;
-      margin-top: 50px;
-      font-style: italic;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="container">
-    <div class="header-area">
-      <h2>Insumos Pendientes de Aprobación</h2>
-      <a href="dashboard.html" class="link-back">← Volver al Panel</a>
-    </div>
-
-    <div id="pendingList"></div>
-  </div>
-
-  <script>
-    // 1. Cargar datos desde localStorage
-    let items = JSON.parse(localStorage.getItem("items")) || [];
-    const session = JSON.parse(localStorage.getItem("session"));
-
-    // 2. Seguridad: Solo el administrador puede entrar aquí
-    if (!session || session.role !== 'admin') {
-      alert("Acceso denegado. Solo para administradores.");
-      window.location.href = "dashboard.html";
-    }
-
-    // 3. Función para mostrar los items pendientes
-    function renderPending() {
-      const listContainer = document.getElementById("pendingList");
-      listContainer.innerHTML = "";
-
-      // Filtrar solo los que están en estado 'pendiente'
-      const pendingItems = items.filter(item => item.status === "pendiente");
-
-      if (pendingItems.length === 0) {
-        listContainer.innerHTML = '<p class="empty-state">No hay solicitudes esperando aprobación.</p>';
-        return;
-      }
-
-      pendingItems.forEach(item => {
-        const card = document.createElement("div");
-        card.className = "card-item";
-        card.innerHTML = `
-          <div class="card-content">
-            <b>📦 ${item.name}</b>
-            <p>Cantidad: ${item.qty}</p>
-            <p><small>Reportado por: ${item.reportedBy} el ${item.date}</small></p>
-            <p><i>Motivo: ${item.reason}</i></p>
-          </div>
-          <div class="card-actions">
-            <button class="btn-approve" onclick="updateStatus(${item.id}, 'aprobado')">Aprobar</button>
-            <button class="btn-reject" onclick="updateStatus(${item.id}, 'rechazado')">Rechazar</button>
-          </div>
-        `;
-        listContainer.appendChild(card);
-      });
-    }
-
-    // 4. Función para cambiar el estado
-    window.updateStatus = function(id, newStatus) {
-      items = items.map(item => {
-        if (item.id === id) {
-          return { 
-            ...item, 
-            status: newStatus, 
-            reviewedBy: session.user,
-            reviewDate: new Date().toLocaleString() 
-          };
-        }
-        return item;
-      });
-
-      // Guardar en localStorage
-      localStorage.setItem("items", JSON.stringify(items));
-      
-      // Refrescar la lista en pantalla
-      renderPending();
-      alert("Registro " + newStatus + " con éxito.");
-    };
-
-    // Ejecutar al cargar la página
-    document.addEventListener("DOMContentLoaded", renderPending);
-  </script>
-</body>
-</html>
+  } catch (error) {
+    console.error(error);
+    alert("Error al actualizar");
+  }
+}
+</script>

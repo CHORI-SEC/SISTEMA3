@@ -7,7 +7,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const welcome = document.getElementById("welcomeText");
   const adminCard = document.getElementById("adminCard");
 
-  // 🔐 Verificar usuario autenticado
+  // Validación defensiva (evita tu error actual)
+  if (!welcome || !adminCard) {
+    console.error("Elementos del DOM no encontrados");
+    return;
+  }
+
+  // 🔐 Estado de autenticación
   auth.onAuthStateChanged(async (user) => {
 
     if (!user) {
@@ -16,41 +22,49 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      // 🔥 Obtener rol desde Firestore
       const userRef = doc(db, "users", user.uid);
       const userSnap = await getDoc(userRef);
 
+      // ⚠️ Usuario no existe en Firestore
       if (!userSnap.exists()) {
-        alert("Usuario sin rol asignado");
+        console.warn("Usuario sin documento en Firestore");
+
+        welcome.innerText = `Hola, ${user.email} (sin rol)`;
         return;
       }
 
       const data = userSnap.data();
 
-      // 👤 Mostrar info
-      if (welcome) {
-        welcome.innerText = `Hola, ${data.email} (${data.role})`;
-      }
+      // 🧠 fallback por si falta algo en DB
+      const role = data.role || "sin rol";
+      const email = data.email || user.email;
 
-      // 🔑 Mostrar panel admin solo si corresponde
-      if (data.role === "admin" && adminCard) {
+      welcome.innerText = `Hola, ${email} (${role})`;
+
+      // 🔑 Control de acceso
+      if (role === "admin") {
         adminCard.classList.remove("hidden");
         adminCard.style.display = "flex";
+      } else {
+        adminCard.style.display = "none";
       }
 
     } catch (error) {
-      console.error(error);
-      alert("Error cargando usuario");
+      console.error("Error Firebase:", error);
+      alert("Error cargando datos del usuario");
     }
 
   });
 
 });
 
-// 🚪 Logout GLOBAL (fuera del DOMContentLoaded)
-window.logout = function() {
-  auth.signOut().then(() => {
+// 🚪 Logout limpio
+window.logout = async function() {
+  try {
+    await auth.signOut();
     window.location.href = "index.html";
-  });
+  } catch (error) {
+    console.error("Error al cerrar sesión:", error);
+  }
 };
 </script>

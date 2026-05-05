@@ -1,92 +1,82 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <title>Historial</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Historial de Pedidos</title>
-  <style>
-    body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
-    .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-    
-    .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-    
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th { background-color: #2c3e50; color: white; text-align: left; padding: 12px; }
-    td { padding: 12px; border-bottom: 1px solid #eee; color: #444; }
-    tr:hover { background-color: #f9f9f9; }
-
-    /* Badges de estado */
-    .badge { padding: 5px 10px; border-radius: 15px; font-size: 0.85rem; font-weight: bold; text-transform: capitalize; }
-    .badge-aprobado { background: #d4edda; color: #155724; }
-    .badge-rechazado { background: #f8d7da; color: #721c24; }
-    .badge-pendiente { background: #fff3cd; color: #856404; }
-
-    .btn-back { text-decoration: none; color: #3498db; font-weight: bold; }
-  </style>
+  <link rel="stylesheet" href="./css/styles.css">
 </head>
+
 <body>
 
-  <div class="container">
-    <div class="header-flex">
-      <h1>Historial de Insumos</h1>
-      <a href="dashboard.html" class="btn-back">← Volver al Panel</a>
-    </div>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Fecha</th>
-          <th>Insumo</th>
-          <th>Cant.</th>
-          <th>Estado</th>
-          <th>Usuario</th>
-        </tr>
-      </thead>
-      <tbody id="historyList">
-        </tbody>
-    </table>
+  <div class="navbar">
+    <span>Historial de pedidos</span>
+    <button onclick="logout()">Cerrar sesión</button>
   </div>
 
-  <script>
-    // --- LÓGICA UNIFICADA ---
+  <div class="container">
+    <div id="list"></div>
+  </div>
 
-    document.addEventListener("DOMContentLoaded", function() {
-      // 1. Obtener sesión y datos
-      const session = JSON.parse(localStorage.getItem("session"));
-      const items = JSON.parse(localStorage.getItem("items")) || [];
+  <script type="module">
+    import { auth, db } from "./firebase.js";
+    import { collection, getDocs, query, where, orderBy } 
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-      // 2. Protección: Si no hay sesión, al login
-      if (!session) {
+    const list = document.getElementById("list");
+
+    auth.onAuthStateChanged(async (user) => {
+
+      if (!user) {
         window.location.href = "index.html";
         return;
       }
 
-      const container = document.getElementById("historyList");
-      if (!container) return;
+      try {
+        // 🔥 SOLO pedidos del usuario
+        const q = query(
+          collection(db, "items"),
+          where("userId", "==", user.uid),
+          orderBy("createdAt", "desc")
+        );
 
-      container.innerHTML = "";
-      
-      // 3. Invertir el array para ver lo más reciente primero
-      const historyItems = [...items].reverse();
+        const snapshot = await getDocs(q);
 
-      if (historyItems.length === 0) {
-        container.innerHTML = "<tr><td colspan='5' style='text-align:center; padding: 20px; color: #999;'>No hay registros aún</td></tr>";
-        return;
+        if (snapshot.empty) {
+          list.innerHTML = "<p>No tienes pedidos aún</p>";
+          return;
+        }
+
+        list.innerHTML = "";
+
+        snapshot.forEach(doc => {
+          const data = doc.data();
+
+          const div = document.createElement("div");
+          div.className = "card";
+
+          div.innerHTML = `
+            <h3>${data.name}</h3>
+            <p>Cantidad: ${data.qty}</p>
+            <p>Motivo: ${data.reason}</p>
+            <p>Estado: ${data.status}</p>
+          `;
+
+          list.appendChild(div);
+        });
+
+      } catch (error) {
+        console.error(error);
+        list.innerHTML = "<p>Error cargando historial</p>";
       }
 
-      // 4. Dibujar las filas de la tabla
-      historyItems.forEach(i => {
-        container.innerHTML += `
-          <tr>
-            <td><small>${i.date}</small></td>
-            <td><strong>${i.name}</strong><br><small style="color: #888;">${i.reason || ''}</small></td>
-            <td>${i.qty}</td>
-            <td><span class="badge badge-${i.status}">${i.status}</span></td>
-            <td>${i.reportedBy}</td>
-          </tr>
-        `;
-      });
     });
+
+    window.logout = async function () {
+      await auth.signOut();
+      window.location.href = "index.html";
+    };
   </script>
+
 </body>
 </html>

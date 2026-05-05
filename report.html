@@ -1,51 +1,105 @@
-<script type="module">
-import { auth, db } from "./firebase.js";
-import { addDoc, collection, serverTimestamp } 
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registrar Insumo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-document.addEventListener("DOMContentLoaded", () => {
+  <!-- CSS -->
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
 
-  // 🔐 Verificar usuario
-  auth.onAuthStateChanged(user => {
-    if (!user) {
-      window.location.href = "index.html";
-    }
-  });
+<body>
 
-  const sendBtn = document.getElementById("sendBtn");
+  <div class="navbar">
+    <span>Registrar Insumo</span>
+    <button onclick="logout()">Cerrar sesión</button>
+  </div>
 
-  console.log("sendBtn:", sendBtn);
-  sendBtn.addEventListener("click", async () => {
+  <div class="container">
 
-    const name = document.getElementById("name").value;
-    const qty = document.getElementById("qty").value;
-    const reason = document.getElementById("reason").value;
+    <div class="card">
+      <h2>Nuevo Pedido</h2>
 
-    if (!name || !qty || !reason) {
-      alert("Completa todos los campos");
-      return;
-    }
+      <input type="text" id="name" placeholder="Nombre del insumo">
+      <input type="number" id="qty" placeholder="Cantidad">
+      <input type="text" id="reason" placeholder="Motivo">
 
-    try {
-      await addDoc(collection(db, "items"), {
-        name,
-        qty,
-        reason,
-        status: "pendiente",
-        createdAt: serverTimestamp(),
-        userId: auth.currentUser.uid,
-        userEmail: auth.currentUser.email
+      <button id="sendBtn" class="btn-primary">Enviar</button>
+    </div>
+
+  </div>
+
+  <script type="module">
+    import { auth, db } from "./firebase.js";
+    import { addDoc, collection, serverTimestamp } 
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    let currentUser = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+
+      const sendBtn = document.getElementById("sendBtn");
+
+      if (!sendBtn) {
+        console.error("sendBtn no existe");
+        return;
+      }
+
+      // 🔐 Auth correcto
+      auth.onAuthStateChanged(user => {
+        if (!user) {
+          window.location.href = "index.html";
+        } else {
+          currentUser = user;
+        }
       });
 
-      alert("Pedido guardado");
-      window.location.href = "dashboard.html";
+      sendBtn.addEventListener("click", async () => {
 
-    } catch (error) {
-      console.error(error);
-      alert("Error al guardar");
-    }
+        if (!currentUser) {
+          alert("Usuario no autenticado aún");
+          return;
+        }
 
-  });
+        const name = document.getElementById("name").value.trim();
+        const qty = document.getElementById("qty").value.trim();
+        const reason = document.getElementById("reason").value.trim();
 
-});
-</script>
+        if (!name || !qty || !reason) {
+          alert("Completa todos los campos");
+          return;
+        }
+
+        try {
+          await addDoc(collection(db, "items"), {
+            name,
+            qty: Number(qty),
+            reason,
+            status: "pendiente",
+            createdAt: serverTimestamp(),
+            userId: currentUser.uid,
+            userEmail: currentUser.email
+          });
+
+          alert("Pedido guardado");
+          window.location.href = "dashboard.html";
+
+        } catch (error) {
+          console.error(error);
+          alert("Error al guardar");
+        }
+
+      });
+
+    });
+
+    // logout global
+    window.logout = async function () {
+      await auth.signOut();
+      window.location.href = "index.html";
+    };
+  </script>
+
+</body>
+</html>

@@ -1,70 +1,119 @@
-<script type="module">
-import { auth, db } from "./firebase.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-document.addEventListener("DOMContentLoaded", () => {
-
-  const welcome = document.getElementById("welcomeText");
-  const adminCard = document.getElementById("adminCard");
-
-  // Validación defensiva (evita tu error actual)
-  if (!welcome || !adminCard) {
-    console.error("Elementos del DOM no encontrados");
-    return;
-  }
-
-  // 🔐 Estado de autenticación
-  auth.onAuthStateChanged(async (user) => {
-
-    if (!user) {
-      window.location.href = "index.html";
-      return;
+  <style>
+    body {
+      font-family: Arial;
+      margin: 0;
+      background: #f4f7f6;
     }
 
-    try {
-      const userRef = doc(db, "users", user.uid);
-      const userSnap = await getDoc(userRef);
+    .navbar {
+      background: #2c3e50;
+      color: white;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+    }
 
-      // ⚠️ Usuario no existe en Firestore
-      if (!userSnap.exists()) {
-        console.warn("Usuario sin documento en Firestore");
+    .menu {
+      padding: 40px;
+    }
 
-        welcome.innerText = `Hola, ${user.email} (sin rol)`;
+    .card {
+      background: white;
+      padding: 20px;
+      margin: 10px 0;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="navbar">
+    <span id="welcomeText">Cargando...</span>
+    <button onclick="logout()">Cerrar sesión</button>
+  </div>
+
+  <div class="menu">
+
+    <div class="card" onclick="location.href='report.html'">
+      📦 Registrar Insumo
+    </div>
+
+    <div id="adminCard" class="card hidden" onclick="location.href='approve.html'">
+      ⚖️ Aprobaciones (Admin)
+    </div>
+
+    <div class="card" onclick="location.href='history.html'">
+      📋 Historial
+    </div>
+
+  </div>
+
+  <!-- 🔥 SCRIPT AQUÍ ABAJO -->
+  <script type="module">
+    import { auth, db } from "./firebase.js";
+    import { doc, getDoc } 
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    document.addEventListener("DOMContentLoaded", () => {
+
+      const welcome = document.getElementById("welcomeText");
+      const adminCard = document.getElementById("adminCard");
+
+      if (!welcome || !adminCard) {
+        console.error("Elementos no encontrados");
         return;
       }
 
-      const data = userSnap.data();
+      auth.onAuthStateChanged(async (user) => {
 
-      // 🧠 fallback por si falta algo en DB
-      const role = data.role || "sin rol";
-      const email = data.email || user.email;
+        if (!user) {
+          window.location.href = "index.html";
+          return;
+        }
 
-      welcome.innerText = `Hola, ${email} (${role})`;
+        try {
+          const ref = doc(db, "users", user.uid);
+          const snap = await getDoc(ref);
 
-      // 🔑 Control de acceso
-      if (role === "admin") {
-        adminCard.classList.remove("hidden");
-        adminCard.style.display = "flex";
-      } else {
-        adminCard.style.display = "none";
-      }
+          if (!snap.exists()) {
+            welcome.innerText = `Hola, ${user.email} (sin rol)`;
+            return;
+          }
 
-    } catch (error) {
-      console.error("Error Firebase:", error);
-      alert("Error cargando datos del usuario");
-    }
+          const data = snap.data();
 
-  });
+          welcome.innerText = `Hola, ${data.email} (${data.role})`;
 
-});
+          if (data.role === "admin") {
+            adminCard.classList.remove("hidden");
+          }
 
-// 🚪 Logout limpio
-window.logout = async function() {
-  try {
-    await auth.signOut();
-    window.location.href = "index.html";
-  } catch (error) {
-    console.error("Error al cerrar sesión:", error);
-  }
-};
-</script>
+        } catch (err) {
+          console.error(err);
+        }
+
+      });
+
+    });
+
+    window.logout = async function () {
+      await auth.signOut();
+      window.location.href = "index.html";
+    };
+  </script>
+
+</body>
+</html>

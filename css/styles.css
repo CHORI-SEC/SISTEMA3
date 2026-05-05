@@ -59,6 +59,22 @@ p, span, label {
   color: var(--color-texto);
 }
 
+.navbar {
+  background: #2c3e50;
+  color: white;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.menu {
+  padding: 40px;
+}
+
+.hidden {
+  display: none;
+}
+
 /* ====== BOTONES ====== */
 .btn-primary {
   background-color: var(--color-primario);

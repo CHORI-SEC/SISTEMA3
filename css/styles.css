@@ -137,12 +137,6 @@ a:hover {
 }
 
 
-.card {
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin-top: 10px;
-}
-
 /* ===== LOGIN ===== */
 .login-body {
   min-height: 100vh;

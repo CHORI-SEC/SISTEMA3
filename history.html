@@ -4,13 +4,14 @@
   <meta charset="UTF-8">
   <title>Historial</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <link rel="stylesheet" href="./css/styles.css">
 </head>
 
 <body>
 
   <div class="navbar">
-    <span>Historial de pedidos</span>
+    <span id="title">Historial</span>
     <button onclick="logout()">Cerrar sesión</button>
   </div>
 
@@ -20,10 +21,12 @@
 
   <script type="module">
     import { auth, db } from "./firebase.js";
-    import { collection, getDocs, query, where, orderBy } 
-    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { 
+      collection, getDocs, query, where, orderBy, doc, getDoc 
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const list = document.getElementById("list");
+    const title = document.getElementById("title");
 
     auth.onAuthStateChanged(async (user) => {
 
@@ -33,33 +36,67 @@
       }
 
       try {
-        // 🔥 SOLO pedidos del usuario
-        const q = query(
-          collection(db, "items"),
-          where("userId", "==", user.uid),
-          orderBy("createdAt", "desc")
-        );
+        // 🔥 Obtener rol
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+
+        if (!userSnap.exists()) {
+          list.innerHTML = "<p>No tienes datos de usuario</p>";
+          return;
+        }
+
+        const role = userSnap.data().role;
+
+        let q;
+
+        // 🧠 Query según rol
+        if (role === "admin") {
+
+          title.innerText = "Historial (Admin)";
+          
+          q = query(
+            collection(db, "items"),
+            orderBy("createdAt", "desc")
+          );
+
+        } else {
+
+          title.innerText = "Mis pedidos";
+
+          q = query(
+            collection(db, "items"),
+            where("userId", "==", user.uid),
+            orderBy("createdAt", "desc")
+          );
+        }
 
         const snapshot = await getDocs(q);
 
         if (snapshot.empty) {
-          list.innerHTML = "<p>No tienes pedidos aún</p>";
+          list.innerHTML = "<p>No hay pedidos</p>";
           return;
         }
 
         list.innerHTML = "";
 
-        snapshot.forEach(doc => {
-          const data = doc.data();
+        snapshot.forEach(docSnap => {
+          const data = docSnap.data();
 
           const div = document.createElement("div");
           div.className = "card";
+
+          // 🎨 color por estado
+          let color = "#ccc";
+          if (data.status === "aprobado") color = "green";
+          if (data.status === "rechazado") color = "red";
 
           div.innerHTML = `
             <h3>${data.name}</h3>
             <p>Cantidad: ${data.qty}</p>
             <p>Motivo: ${data.reason}</p>
-            <p>Estado: ${data.status}</p>
+            <p style="color:${color}; font-weight:bold;">
+              Estado: ${data.status}
+            </p>
           `;
 
           list.appendChild(div);

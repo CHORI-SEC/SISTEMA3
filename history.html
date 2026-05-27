@@ -20,9 +20,17 @@
   </div>
 
   <script type="module">
+
     import { auth, db } from "./firebase.js";
-    import { 
-      collection, getDocs, query, where, orderBy, doc, getDoc 
+
+    import {
+      collection,
+      getDocs,
+      query,
+      where,
+      orderBy,
+      doc,
+      getDoc
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const list = document.getElementById("list");
@@ -36,41 +44,47 @@
       }
 
       try {
-        // 🔥 Obtener rol
+
+        // Buscar rol
+        let role = "user";
+
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
 
-        if (!userSnap.exists()) {
-          list.innerHTML = "<p>No tienes datos de usuario</p>";
-          return;
+        if (userSnap.exists()) {
+          role = userSnap.data().role || "user";
         }
-
-        const role = userSnap.data().role;
 
         let q;
 
-        // 🧠 Query según rol
+        // ADMIN
         if (role === "admin") {
 
           title.innerText = "Historial (Admin)";
-          
+
           q = query(
             collection(db, "items"),
-            orderBy("createdAt", "desc")
+            orderBy("created at", "desc")
           );
 
         } else {
 
+          // USER NORMAL
           title.innerText = "Mis pedidos";
 
           q = query(
             collection(db, "items"),
             where("userId", "==", user.uid),
-            orderBy("createdAt", "desc")
+            orderBy("created at", "desc")
           );
         }
 
         const snapshot = await getDocs(q);
+
+        console.log(
+          "Pedidos:",
+          snapshot.docs.map(d => d.data())
+        );
 
         if (snapshot.empty) {
           list.innerHTML = "<p>No hay pedidos</p>";
@@ -79,32 +93,57 @@
 
         list.innerHTML = "";
 
-        snapshot.forEach(docSnap => {
+        snapshot.forEach((docSnap) => {
+
           const data = docSnap.data();
 
           const div = document.createElement("div");
           div.className = "card";
 
-          // 🎨 color por estado
-          let color = "#ccc";
-          if (data.status === "aprobado") color = "green";
-          if (data.status === "rechazado") color = "red";
+          let color = "#999";
+
+          if (data.status === "aprobado") {
+            color = "green";
+          }
+
+          if (data.status === "rechazado") {
+            color = "red";
+          }
+
+          let fecha = "Sin fecha";
+
+          if (data["created at"]?.toDate) {
+            fecha = data["created at"]
+              .toDate()
+              .toLocaleString();
+          }
 
           div.innerHTML = `
-            <h3>${data.name}</h3>
-            <p>Cantidad: ${data.qty}</p>
-            <p>Motivo: ${data.reason}</p>
+            <h3>${data.name || "Sin nombre"}</h3>
+
+            <p><strong>Cantidad:</strong> ${data.qty || 0}</p>
+
+            <p><strong>Motivo:</strong> ${data.reason || "Sin motivo"}</p>
+
+            <p><strong>Fecha:</strong> ${fecha}</p>
+
             <p style="color:${color}; font-weight:bold;">
-              Estado: ${data.status}
+              Estado: ${data.status || "pendiente"}
             </p>
           `;
 
           list.appendChild(div);
+
         });
 
       } catch (error) {
+
         console.error(error);
-        list.innerHTML = "<p>Error cargando historial</p>";
+
+        list.innerHTML = `
+          <p>Error cargando historial</p>
+          <p>${error.message}</p>
+        `;
       }
 
     });
@@ -113,6 +152,7 @@
       await auth.signOut();
       window.location.href = "index.html";
     };
+
   </script>
 
 </body>
